@@ -5,6 +5,7 @@ let clickUpgradeCost = parseInt(localStorage.getItem('clickUpgradeCost')) || 10;
 let cpsUpgradeCost = parseInt(localStorage.getItem('cpsUpgradeCost')) || 20;
 function Reset() {
 localStorage.clear();
+let clicks =0;
 updateClickCount();
 }
 
