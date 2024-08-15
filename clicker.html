@@ -1,67 +1,19 @@
 <!DOCTYPE html>
-<html lang="ru">
-
+<html lang='ru'>
 <head>
   <meta charset="UTF-8">
   <title>Clicker Game</title>
   <style>
-
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-    }
-
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      margin: 10px;
-    }
-
-    #clickCount {
-      font-size: 24px;
-    }
-
-    .upgrade-section {
-      margin-top: 20px;
-    }
-
+  body {
+  text-align: center;
+  }
   </style>
 </head>
 <body>
-  <h1>Clicker Game</h1>
-  <p>Click the button to increase your score:</p>
-  <button id="clickButton" onclick="incrementClicks()">Click</button>
-  <p id="clickCount">Clicks: 0</p>
-  
-  
-  
-  <div style="z-index: 0;">
-  <img id="playAnimation" src="C:\Users\meowchik\Desktop\click\body.gif">
-  
-  <img style="position: absolute;" src="C:\Users\meowchik\Desktop\click\block.png">
-  </div>
-  
-  <div>
-	<img style="position: absolute; z-index: 1; left: 50%; transform: translate(-50%, -50%); margin-top: -20%"src="C:\Users\meowchik\Desktop\click\head.gif">
-  </div>
-  
-  <h2>Shop</h2>
-
-  <div id="clicksPerClickSection" class="upgrade-section">
-    <h3>Upgrade CPC</h3>
-  </div>
-
-  <div id="clicksPerSecondSection" class="upgrade-section">
-    <h3>Upgrade CPS</h3>
-  </div>
-
-    <h3>Save</h3>
-  
-  <button onclick="Reset()">Reset</button>
-  <button onclick="downloadProgress()">Download Progress</button>
-  <input type="file" id="fileInput" style="display: none;">
-  <button onclick="uploadProgress()">Upload Progress</button>
-
+<h1 id='clicks'>Блоков: 0</h1>
+  <p> 
+  <img src='block.png'>
+  </p>
   <script src="clicker.js"></script>
 </body>
 
