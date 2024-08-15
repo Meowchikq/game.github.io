@@ -4,11 +4,7 @@ let clickMultiplier = parseInt(localStorage.getItem('clickMultiplier')) || 1;
 let clickUpgradeCost = parseInt(localStorage.getItem('clickUpgradeCost')) || 10;
 let cpsUpgradeCost = parseInt(localStorage.getItem('cpsUpgradeCost')) || 20;
 function Reset() {
-localStorage.setItem('clicks', 0);
-localStorage.setItem('autoclicks', 0);
-localStorage.setItem('clickMultiplier', 1);
-localStorage.setItem('clickUpgradeCost', 10);
-localStorage.setItem('clickUpgradeCost', 20);
+localStorage.clear();
 updateClickCount();
 }
 
