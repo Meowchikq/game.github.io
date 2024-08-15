@@ -7,6 +7,6 @@ block.onclick=function() {
 		setTimeout(()=>{block.setAttribute('src', 'block.png');},100);
 	}
 };
-document.querySelector('html').onclick=()=>alert('Жми на блок')
+
 	
 		
