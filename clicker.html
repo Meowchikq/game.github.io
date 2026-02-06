@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -26,25 +27,18 @@
 
     #joystick {
       position: absolute;
-      width: 120px;
-      height: 120px;
       background: rgba(255,255,255,0.1);
       border-radius: 50%;
       touch-action: none;
       /* По ширине - по центру, по высоте - 3% от низа */
       left: 50%;
       transform: translateX(-50%);
-      bottom: calc(3vh + 60px); /* 3% от высоты + половина высоты джойстика */
     }
 
     #stick {
-      width: 50px;
-      height: 50px;
+      position: absolute;
       background: rgba(255,255,255,0.5);
       border-radius: 50%;
-      position: absolute;
-      top: 35px;
-      left: 35px;
     }
   </style>
 </head>
@@ -65,6 +59,7 @@ const stick = document.getElementById("stick");
 let playerX, playerY;
 let speedX = 0, speedY = 0;
 let dragging = false;
+let joystickSize, stickSize;
 
 // Функция для центрирования игрока
 function centerPlayer() {
@@ -73,6 +68,36 @@ function centerPlayer() {
 
   player.style.left = `${playerX}px`;
   player.style.top = `${playerY}px`;
+}
+
+// Функция для настройки размера и позиции джойстика
+function setupJoystick() {
+  // Размер джойстика зависит от меньшей стороны экрана
+  const screenWidth = window.innerWidth;
+  const screenHeight = window.innerHeight;
+  const minDimension = Math.min(screenWidth, screenHeight);
+  
+  // Джойстик занимает 20% от меньшей стороны экрана
+  joystickSize = minDimension * 0.2;
+  
+  // Стик занимает 40% от джойстика
+  stickSize = joystickSize * 0.4;
+  
+  // Устанавливаем размеры
+  joystick.style.width = `${joystickSize}px`;
+  joystick.style.height = `${joystickSize}px`;
+  
+  stick.style.width = `${stickSize}px`;
+  stick.style.height = `${stickSize}px`;
+  
+  // Позиционируем стик по центру джойстика
+  const stickOffset = (joystickSize - stickSize) / 2;
+  stick.style.left = `${stickOffset}px`;
+  stick.style.top = `${stickOffset}px`;
+  
+  // Позиционируем джойстик (центр по ширине, 3% от низа)
+  const joystickBottom = screenHeight * 0.03 + joystickSize / 2;
+  joystick.style.bottom = `${joystickBottom}px`;
 }
 
 // Обработчики событий
@@ -86,8 +111,9 @@ document.addEventListener("pointerup", () => {
   if (dragging) {
     dragging = false;
     // Возвращаем стик в центр джойстика
-    stick.style.left = "35px";
-    stick.style.top = "35px";
+    const stickOffset = (joystickSize - stickSize) / 2;
+    stick.style.left = `${stickOffset}px`;
+    stick.style.top = `${stickOffset}px`;
     speedX = 0;
     speedY = 0;
   }
@@ -100,8 +126,8 @@ document.addEventListener("pointermove", (e) => {
 
 function updateStickPosition(e) {
   const rect = joystick.getBoundingClientRect();
-  const joystickRadius = joystick.offsetWidth / 2;
-  const stickRadius = stick.offsetWidth / 2;
+  const joystickRadius = joystickSize / 2;
+  const stickRadius = stickSize / 2;
   
   // Координаты относительно центра джойстика
   let x = e.clientX - rect.left - joystickRadius;
@@ -120,12 +146,14 @@ function updateStickPosition(e) {
   stick.style.left = `${joystickRadius + x - stickRadius}px`;
   stick.style.top = `${joystickRadius + y - stickRadius}px`;
   
-  // Вычисляем скорость
+  // Вычисляем скорость (зависит от размера экрана)
   const normalizedX = x / maxDistance;
   const normalizedY = y / maxDistance;
   
-  speedX = normalizedX * 5;
-  speedY = normalizedY * 5;
+  // Базовая скорость 5, но адаптированная к размеру экрана
+  const baseSpeed = Math.max(window.innerWidth, window.innerHeight) * 0.005;
+  speedX = normalizedX * baseSpeed;
+  speedY = normalizedY * baseSpeed;
 }
 
 function gameLoop() {
@@ -149,12 +177,17 @@ function gameLoop() {
 // Инициализация
 function init() {
   centerPlayer();
+  setupJoystick();
   gameLoop();
 }
 
 window.addEventListener('load', init);
-window.addEventListener('resize', centerPlayer);
+window.addEventListener('resize', () => {
+  centerPlayer();
+  setupJoystick();
+});
 </script>
 
 </body>
 </html>
+```
