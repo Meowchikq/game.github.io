@@ -31,7 +31,10 @@
       background: rgba(255,255,255,0.1);
       border-radius: 50%;
       touch-action: none;
-      /* Центрируем через JS */
+      /* По ширине - по центру, по высоте - 3% от низа */
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: calc(3vh + 60px); /* 3% от высоты + половина высоты джойстика */
     }
 
     #stick {
@@ -62,7 +65,6 @@ const stick = document.getElementById("stick");
 let playerX, playerY;
 let speedX = 0, speedY = 0;
 let dragging = false;
-let joystickCenterX, joystickCenterY;
 
 // Функция для центрирования игрока
 function centerPlayer() {
@@ -73,21 +75,10 @@ function centerPlayer() {
   player.style.top = `${playerY}px`;
 }
 
-// Функция для центрирования джойстика
-function centerJoystick() {
-  // Центр экрана минус половина ширины/высоты джойстика
-  joystickCenterX = window.innerWidth / 2;
-  joystickCenterY = window.innerHeight / 2;
-  
-  joystick.style.left = `${joystickCenterX - joystick.offsetWidth/2}px`;
-  joystick.style.top = `${joystickCenterY - joystick.offsetHeight/2}px`;
-}
-
 // Обработчики событий
 joystick.addEventListener("pointerdown", (e) => {
   dragging = true;
   e.preventDefault();
-  // Начинаем с текущей позиции касания
   updateStickPosition(e);
 });
 
@@ -129,11 +120,11 @@ function updateStickPosition(e) {
   stick.style.left = `${joystickRadius + x - stickRadius}px`;
   stick.style.top = `${joystickRadius + y - stickRadius}px`;
   
-  // Вычисляем скорость (нормализованное значение от -1 до 1)
+  // Вычисляем скорость
   const normalizedX = x / maxDistance;
   const normalizedY = y / maxDistance;
   
-  speedX = normalizedX * 5; // Скорость умноженная на коэффициент
+  speedX = normalizedX * 5;
   speedY = normalizedY * 5;
 }
 
@@ -158,15 +149,11 @@ function gameLoop() {
 // Инициализация
 function init() {
   centerPlayer();
-  centerJoystick();
   gameLoop();
 }
 
 window.addEventListener('load', init);
-window.addEventListener('resize', () => {
-  centerPlayer();
-  centerJoystick();
-});
+window.addEventListener('resize', centerPlayer);
 </script>
 
 </body>
