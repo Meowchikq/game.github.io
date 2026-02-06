@@ -26,14 +26,12 @@
 
     #joystick {
       position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
       width: 120px;
       height: 120px;
       background: rgba(255,255,255,0.1);
       border-radius: 50%;
       touch-action: none;
+      /* Центрируем через JS */
     }
 
     #stick {
@@ -64,7 +62,7 @@ const stick = document.getElementById("stick");
 let playerX, playerY;
 let speedX = 0, speedY = 0;
 let dragging = false;
-let stickCenterX, stickCenterY;
+let joystickCenterX, joystickCenterY;
 
 // Функция для центрирования игрока
 function centerPlayer() {
@@ -77,28 +75,26 @@ function centerPlayer() {
 
 // Функция для центрирования джойстика
 function centerJoystick() {
-  // Джойстик всегда по центру экрана
-  const joystickX = window.innerWidth / 2;
-  const joystickY = window.innerHeight / 2;
-
-  joystick.style.left = `${joystickX}px`;
-  joystick.style.top = `${joystickY}px`;
+  // Центр экрана минус половина ширины/высоты джойстика
+  joystickCenterX = window.innerWidth / 2;
+  joystickCenterY = window.innerHeight / 2;
   
-  // Сохраняем центр джойстика
-  stickCenterX = joystick.offsetWidth / 2;
-  stickCenterY = joystick.offsetHeight / 2;
+  joystick.style.left = `${joystickCenterX - joystick.offsetWidth/2}px`;
+  joystick.style.top = `${joystickCenterY - joystick.offsetHeight/2}px`;
 }
 
 // Обработчики событий
-joystick.addEventListener("pointerdown", e => {
+joystick.addEventListener("pointerdown", (e) => {
   dragging = true;
   e.preventDefault();
+  // Начинаем с текущей позиции касания
+  updateStickPosition(e);
 });
 
-document.addEventListener("pointerup", e => {
+document.addEventListener("pointerup", () => {
   if (dragging) {
     dragging = false;
-    // Возвращаем стик в центр
+    // Возвращаем стик в центр джойстика
     stick.style.left = "35px";
     stick.style.top = "35px";
     speedX = 0;
@@ -106,54 +102,67 @@ document.addEventListener("pointerup", e => {
   }
 });
 
-document.addEventListener("pointermove", e => {
+document.addEventListener("pointermove", (e) => {
   if (!dragging) return;
-
-  const rect = joystick.getBoundingClientRect();
-  let x = e.clientX - rect.left - stickCenterX;
-  let y = e.clientY - rect.top - stickCenterY;
-
-  const max = 35;
-  const distance = Math.hypot(x, y);
-
-  if (distance > max) {
-    x = x / distance * max;
-    y = y / distance * max;
-  }
-
-  stick.style.left = x + stickCenterX - 25 + "px";
-  stick.style.top = y + stickCenterY - 25 + "px";
-
-  // Скорость зависит от положения стика
-  speedX = x * 0.15;
-  speedY = y * 0.15;
+  updateStickPosition(e);
 });
+
+function updateStickPosition(e) {
+  const rect = joystick.getBoundingClientRect();
+  const joystickRadius = joystick.offsetWidth / 2;
+  const stickRadius = stick.offsetWidth / 2;
+  
+  // Координаты относительно центра джойстика
+  let x = e.clientX - rect.left - joystickRadius;
+  let y = e.clientY - rect.top - joystickRadius;
+  
+  // Ограничиваем радиус движения стика
+  const maxDistance = joystickRadius - stickRadius;
+  const distance = Math.sqrt(x*x + y*y);
+  
+  if (distance > maxDistance) {
+    x = (x / distance) * maxDistance;
+    y = (y / distance) * maxDistance;
+  }
+  
+  // Позиционируем стик
+  stick.style.left = `${joystickRadius + x - stickRadius}px`;
+  stick.style.top = `${joystickRadius + y - stickRadius}px`;
+  
+  // Вычисляем скорость (нормализованное значение от -1 до 1)
+  const normalizedX = x / maxDistance;
+  const normalizedY = y / maxDistance;
+  
+  speedX = normalizedX * 5; // Скорость умноженная на коэффициент
+  speedY = normalizedY * 5;
+}
 
 function gameLoop() {
   // Обновляем позицию игрока
   playerX += speedX;
   playerY += speedY;
-
-  // Границы экрана с учетом размера игрока
+  
+  // Границы экрана
   const maxX = window.innerWidth - 40;
   const maxY = window.innerHeight - 40;
-
+  
   playerX = Math.max(0, Math.min(maxX, playerX));
   playerY = Math.max(0, Math.min(maxY, playerY));
-
+  
   player.style.left = `${playerX}px`;
   player.style.top = `${playerY}px`;
-
+  
   requestAnimationFrame(gameLoop);
 }
 
 // Инициализация
-window.addEventListener('load', () => {
+function init() {
   centerPlayer();
   centerJoystick();
   gameLoop();
-});
+}
 
+window.addEventListener('load', init);
 window.addEventListener('resize', () => {
   centerPlayer();
   centerJoystick();
