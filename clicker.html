@@ -50,7 +50,6 @@
 
 <div id="game">
   <div id="player"></div>
-
   <div id="joystick">
     <div id="stick"></div>
   </div>
@@ -61,16 +60,37 @@ const player = document.getElementById("player");
 const joystick = document.getElementById("joystick");
 const stick = document.getElementById("stick");
 
-let playerX = window.innerWidth / 2 - 20; // Центр по X
-let playerY = window.innerHeight / 2 - 20; // Центр по Y
+let playerX, playerY, joystickX, joystickY;
+let speedX = 0, speedY = 0;
+let dragging = false;
+
+// Функция для центрирования игрока и джойстика
+function centerElements() {
+  // Центрируем игрока по центру экрана
+  playerX = window.innerWidth / 2 - 20; // -20, чтобы учесть размер игрока (40px)
+  playerY = window.innerHeight / 2 - 20;
+
+  player.style.left = `${playerX}px`;
+  player.style.top = `${playerY}px`;
+
+  // Центрируем джойстик по низу экрана
+  joystickX = window.innerWidth / 2 - joystick.offsetWidth / 2;
+  joystickY = window.innerHeight - joystick.offsetHeight - 40;
+
+  joystick.style.left = `${joystickX}px`;
+  joystick.style.top = `${joystickY}px`;
+}
+
+// Перезапуск центрации при изменении размеров экрана
+window.addEventListener('resize', centerElements);
+
+// Вызовем центрирование сразу при загрузке
+centerElements();
 
 let centerX = joystick.offsetWidth / 2;
 let centerY = joystick.offsetHeight / 2;
 
-let dragging = false;
-let speedX = 0;
-let speedY = 0;
-
+// Обработчики событий
 joystick.addEventListener("pointerdown", e => {
   dragging = true;
 });
@@ -109,8 +129,12 @@ function gameLoop() {
   playerX += speedX;
   playerY += speedY;
 
-  player.style.left = playerX + "px";
-  player.style.top = playerY + "px";
+  // Убедимся, что игрок не выходит за экран
+  playerX = Math.max(0, Math.min(window.innerWidth - 40, playerX));
+  playerY = Math.max(0, Math.min(window.innerHeight - 40, playerY));
+
+  player.style.left = `${playerX}px`;
+  player.style.top = `${playerY}px`;
 
   requestAnimationFrame(gameLoop);
 }
