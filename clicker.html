@@ -79,12 +79,14 @@ function centerPlayer() {
 function centerJoystick() {
   // Джойстик всегда по центру экрана
   const joystickX = window.innerWidth / 2;
+  const joystickY = window.innerHeight / 2;
 
   joystick.style.left = `${joystickX}px`;
   joystick.style.top = `${joystickY}px`;
   
   // Сохраняем центр джойстика
   stickCenterX = joystick.offsetWidth / 2;
+  stickCenterY = joystick.offsetHeight / 2;
 }
 
 // Обработчики событий
@@ -160,4 +162,3 @@ window.addEventListener('resize', () => {
 
 </body>
 </html>
-
