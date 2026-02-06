@@ -61,18 +61,38 @@ let speedX = 0, speedY = 0;
 let dragging = false;
 let joystickSize, stickSize;
 
-// Функция для центрирования игрока
-function centerPlayer() {
-  playerX = window.innerWidth / 2 - 20;
-  playerY = window.innerHeight / 2 - 20;
+// Сохраняем относительную позицию игрока при изменении размера
+let playerRelativeX = 0.5; // 0.5 = центр по X (50%)
+let playerRelativeY = 0.5; // 0.5 = центр по Y (50%)
 
+// Функция для инициализации позиции игрока (только при загрузке)
+function initPlayer() {
+  // Начальная позиция по центру
+  playerRelativeX = 0.5;
+  playerRelativeY = 0.5;
+  updatePlayerPosition();
+}
+
+// Функция для обновления позиции игрока на основе относительных координат
+function updatePlayerPosition() {
+  const screenWidth = window.innerWidth;
+  const screenHeight = window.innerHeight;
+  
+  // Преобразуем относительные координаты в абсолютные
+  playerX = playerRelativeX * (screenWidth - 40); // 40 - ширина игрока
+  playerY = playerRelativeY * (screenHeight - 40); // 40 - высота игрока
+  
+  // Ограничиваем значения
+  playerX = Math.max(0, Math.min(screenWidth - 40, playerX));
+  playerY = Math.max(0, Math.min(screenHeight - 40, playerY));
+  
+  // Обновляем абсолютную позицию
   player.style.left = `${playerX}px`;
   player.style.top = `${playerY}px`;
 }
 
 // Функция для настройки размера и позиции джойстика
 function setupJoystick() {
-  // Размер джойстика зависит от меньшей стороны экрана
   const screenWidth = window.innerWidth;
   const screenHeight = window.innerHeight;
   const minDimension = Math.min(screenWidth, screenHeight);
@@ -146,7 +166,7 @@ function updateStickPosition(e) {
   stick.style.left = `${joystickRadius + x - stickRadius}px`;
   stick.style.top = `${joystickRadius + y - stickRadius}px`;
   
-  // Вычисляем скорость (зависит от размера экрана)
+  // Вычисляем скорость
   const normalizedX = x / maxDistance;
   const normalizedY = y / maxDistance;
   
@@ -162,12 +182,19 @@ function gameLoop() {
   playerY += speedY;
   
   // Границы экрана
-  const maxX = window.innerWidth - 40;
-  const maxY = window.innerHeight - 40;
+  const screenWidth = window.innerWidth;
+  const screenHeight = window.innerHeight;
+  const maxX = screenWidth - 40;
+  const maxY = screenHeight - 40;
   
   playerX = Math.max(0, Math.min(maxX, playerX));
   playerY = Math.max(0, Math.min(maxY, playerY));
   
+  // Обновляем относительные координаты для сохранения позиции при ресайзе
+  playerRelativeX = playerX / (screenWidth - 40 || 1); // Избегаем деления на 0
+  playerRelativeY = playerY / (screenHeight - 40 || 1);
+  
+  // Обновляем абсолютную позицию
   player.style.left = `${playerX}px`;
   player.style.top = `${playerY}px`;
   
@@ -176,15 +203,17 @@ function gameLoop() {
 
 // Инициализация
 function init() {
-  centerPlayer();
+  initPlayer();
   setupJoystick();
   gameLoop();
 }
 
 window.addEventListener('load', init);
+
+// При изменении размера окна обновляем только джойстик и позицию игрока
 window.addEventListener('resize', () => {
-  centerPlayer();
   setupJoystick();
+  updatePlayerPosition();
 });
 </script>
 
