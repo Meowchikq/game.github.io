@@ -130,8 +130,8 @@ function gameLoop() {
   playerY += speedY;
 
   // Убедимся, что игрок не выходит за экран
-  playerX = Math.max(0, Math.min(window.innerWidth - 40, playerX));
-  playerY = Math.max(0, Math.min(window.innerHeight - 40, playerY));
+  playerX = Math.max(0, Math.min(window.innerWidth, playerX));
+  playerY = Math.max(0, Math.min(window.innerHeight, playerY));
 
   player.style.left = `${playerX}px`;
   player.style.top = `${playerY}px`;
@@ -144,3 +144,4 @@ gameLoop();
 
 </body>
 </html>
+
